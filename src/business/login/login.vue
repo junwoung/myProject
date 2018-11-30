@@ -12,6 +12,7 @@
 						<label class="require">账号</label>
 						<div clearfix>
 							<input class="input_underline" type="text" v-model="lData.name" placeholder="请输入账号" @change='tips.lname = ""'>
+							<i>请输入账号</i>
 							<span class="tips" :class="tips.lname.type">{{tips.lname.value}}</span>
 						</div>
 					</div>
@@ -30,6 +31,12 @@
 					</div>
 				</div>
 				<div class="register" v-if="status == 'register'">
+					<div class="control_input clearfix" style="height:100px;margin-bottom:0;">
+						<label>头像</label>
+						<div style="float:left;position:relative;left:160px;bottom:50px;">
+							<my-upload :uploadObj='upload' @callback='getUpload'></my-upload>
+						</div>
+					</div>
 					<div class="control_input clearfix">
 						<label class="require">用户名</label>
 						<div>
@@ -90,6 +97,7 @@
 
 <script>
 import Vue from 'vue'
+import axios from 'axios'
 	export default{
 		name: 'login',
 		data(){
@@ -126,7 +134,8 @@ import Vue from 'vue'
 					name: {value:'',type:''},
 					password: {value:'',type:''},
 					ensurePassword: {value:'',type:''}
-				}
+				},
+				upload: {}
 			}
 		},
 		methods: {
@@ -220,6 +229,14 @@ import Vue from 'vue'
 					}
 				}
 				return flag
+			},
+			getUpload: function(upload){
+				console.log(upload)
+				let form = new FormData();
+				form.append('file',upload.files[0])
+				this.$api.uploadImg(form).then((res) => {
+					console.log(res.data)
+				})
 			}
 		},
 		mounted(){

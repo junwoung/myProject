@@ -4,7 +4,7 @@
 		<div class="condition clearfix">
 			<div class="control_input">
 				<label class="label">搜索内容</label>
-				<div><my-select :select="search"></my-select></div>
+				<div><my-select :select="search" @callback="changeData"></my-select></div>
 				<label class="label">请输入过滤条件</label>
 				<input type="text" v-model="condition" class="input input_long" @keydown="listen" @blur="getData">
 			</div>
@@ -13,6 +13,10 @@
 				<my-time :timeObj="startTime"></my-time>
 				<label class="label">结束时间</label>
 				<my-time :timeObj="endTime"></my-time>
+			</div>
+			<div class="control_input">
+				<label class="label">排序条件</label>
+				<div><my-select :select="sort"></my-select></div>
 			</div>
 		</div>
 		<div class="clearfix">
@@ -73,18 +77,24 @@ export default{
 			persons: {},
 			condition: '',
 			search: {
+				// query: true,
 				data: [
 					{id: 1,name: '标题',label: 'title'},
 					{id: 2,name: '内容',label: 'context'}
 				],
 				selected: 1
 			},
+			sort: {
+				data:[{}]
+			},
 			startTime: {
 				selected: ''
 			},
 			endTime: {
 				selected: '',
-				max: (new Date())
+				max: (new Date()),
+				// selected: '2017-11-09',
+				// disable: true
 			}
 		}
 	},
@@ -144,6 +154,22 @@ export default{
 					}
 				}
 			})
+		},
+		changeData: function(){
+			console.log(this.sort.data)
+			this.sort.selected = null
+			if(this.sort.data[0].id){
+				this.sort.data = [
+					{id:3,name:'时间2'},
+					{id:4,name:'回复数2'}
+				]
+			}
+			else{
+				this.sort.data = [
+					{id:1,name:'时间'},
+					{id:2,name:'回复数'}
+				]
+			}		
 		},
 		listen: function(){
 			let code = event.keyCode

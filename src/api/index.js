@@ -4,15 +4,15 @@ import Qs from 'qs'
 
 Vue.prototype.$qs = Qs
 
+let contentType = 'application/x-www-form-urlencoded'
 // axios.defaults.withCredentials = true;
-axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
+axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
 //axios 请求发送时拦截
 axios.interceptors.request.use(config => {
 	return config
 },error => {
 	
 })
-
 /** 请求的链接前缀，一般不变，当请求第三方接口链接时不引用 **/
 const basePath = 'http://localhost.com/yii/testdrive/index.php?r=';
 
@@ -44,7 +44,8 @@ const apiMessage = {
 	cancelRelation: {url: basePath + 'follow/cancelRelation',method: 'get'},
 	justRelation: {url: basePath + 'follow/justRelation',method: 'get'},
 	getFollower:{url: basePath + 'follow/getFollower',method: 'get'},
-	getFollowing: {url: basePath + 'follow/getFollowing',method: 'get'}
+	getFollowing: {url: basePath + 'follow/getFollowing',method: 'get'},
+	uploadImg: {url: basePath + 'upload/uploadImg',method: 'post',type: 'file'}
 };
 
 /**
@@ -53,7 +54,7 @@ const apiMessage = {
  * url 请求地址
  * method 请求方法，默认为get
  */
-const createPromise = (param,url,method) => {
+const createPromise = (param,url,method,header) => {
 	method = method || 'GET'
 	method = method.toUpperCase()
 	let qs = Vue.prototype.$qs
@@ -74,17 +75,30 @@ const createPromise = (param,url,method) => {
 	}
 	else{
 		return new Promise(function(resolve,reject){
-			axios({
-				url: url,
-				method: method,
-				data: qs.stringify(param)
-			}).then(function(res){
-				resolve(res);
-			}).catch(function(res){
-				console.log('请求失败...')
-				console.log(res)
-				reject(res)
-			})
+			if(header){
+				let headers = {headers: {"Content-Type": "multipart/form-data"}}
+				axios.post(url,param,headers).then((res) => {
+					resolve(res)
+				}).catch((res) => {
+					console.log(res)
+					reject(res)
+				})
+			}
+			else{
+				axios({
+					url: url,
+					method: method,
+					data: qs.stringify(param)
+				}).then(function(res){
+					resolve(res);
+				}).catch(function(res){
+					console.log('请求失败...')
+					console.log(res)
+					reject(res)
+				})
+			}
+			
+
 		})
 	}
 }
@@ -173,6 +187,9 @@ const api = {
 	},
 	getFollowing: function(param){
 		return createPromise(param,apiMessage.getFollowing.url,apiMessage.getFollowing.method)
+	},
+	uploadImg: function(param){
+		return createPromise(param,apiMessage.uploadImg.url,apiMessage.uploadImg.method,apiMessage.uploadImg.type)
 	}
 }
 console.log(api)
